@@ -10,10 +10,9 @@ from oauth2client import client
 from oauth2client import tools
 
 import datetime
+
 import time
 from time import strftime
-from dateutil.parser import *
-
 
 try:
     import argparse
@@ -37,11 +36,12 @@ def sendSMS(txt,subject,body,txt2):
 
     if body:
         message = client.messages.create(to="+14088405448",
-                                 from_="+12014821965", body=["Event: \n"+subject+"Description: \n"+body+"Starts: "+txt+"Ends: "+txt2])
+                                 from_="+12014821965", body=["Event: \n"+subject+"\nDescription: \n"+body+"\n\nStarts: "+txt+"\nEnds: "+txt2])
     else:
         message = client.messages.create(to="+14088405448",
                                          from_="+12014821965", body=[txt+" "+subject])
     print("Message sent")
+
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -84,7 +84,7 @@ def main():
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=1, singleEvents=True,
+        calendarId='primary', timeMin=now, maxResults=3, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
@@ -92,7 +92,7 @@ def main():
         print('No upcoming events found.')
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date','description'))
-        end = event['end'].get('dateTime',event['end'].get('date','description'))
+        end = event['end'].get('dateTime',event['end'].get('date'))
         description = event.get('description')
         date = event['start'].get('date','description')
         #date.strftime('%m/%d/%Y')
@@ -106,9 +106,10 @@ def main():
         if location:
             print("Location: \n" + location)
         print("Ends: "+end+" \n")
+        print(datetime.datetime.now())
         print(" ")
-        print(dstime.strftime('%d/%m/%Y'))
-        sendSMS(start,title,description,end)
+#sendSMS(start,title,description,end)
+
 
 if __name__ == '__main__':
     main()
