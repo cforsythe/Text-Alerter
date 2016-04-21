@@ -84,31 +84,79 @@ def main():
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=3, singleEvents=True,
+        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
+    '''Time right now'''
+    
+
+    i=0
+    
     if not events:
         print('No upcoming events found.')
     for event in events:
+        '''Start time code'''
         start = event['start'].get('dateTime', event['start'].get('date','description'))
+        syear = start[0:4]
+        smonth = start[5:7]
+        sday=start[8:10]
+        shour=start[11:13]
+        sminute=start[14:16]
+        shour=int(shour)
+        am = True
+        if shour > 12:
+            shour = shour-12
+            am = False
+        shour = str(shour)
+
+        '''End Time code'''
+        am2=True
         end = event['end'].get('dateTime',event['end'].get('date'))
+        eyear = end[0:4]
+        emonth = end[5:7]
+        eday=end[8:10]
+        ehour=end[11:13]
+        eminute=end[14:16]
+        ehour=int(ehour)
+        if ehour > 12:
+            ehour = ehour-12
+            am2 = False
+        ehour = str(ehour)
+
+        if am2 ==True:
+            ToD = "am"
+        else:
+            ToD = "pm"
+
         description = event.get('description')
         date = event['start'].get('date','description')
         #date.strftime('%m/%d/%Y')
         title = event['summary']
         location = event.get('location')
         woop = start
-        print("Starts: "+start)
-        print("Event: "+title)
+        reminder = event['reminders']['overrides'][0]['minutes']
+        #reminder = event['reminders']
+        i+=i
+
+        starting ="Starts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
+        ending ="Ends: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
+        title="Event: "+title
+
+        print("")
+        print(reminder)
+        print(starting)
+        print(title)
         if description:
-            print("Description: \n" + description)
+            description ="Description: \n" + description
+            print(description)
         if location:
-            print("Location: \n" + location)
-        print("Ends: "+end+" \n")
+            location ="Location: \n" + location
+            print(location)
+        print(ending)
         print(datetime.datetime.now())
         print(" ")
-#sendSMS(start,title,description,end)
+#sendSMS(starting,title,description,ending)
 
 
 if __name__ == '__main__':
