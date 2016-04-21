@@ -36,10 +36,10 @@ def sendSMS(txt,subject,body,txt2):
 
     if body:
         message = client.messages.create(to="+14088405448",
-                                 from_="+12014821965", body=["Event: \n"+subject+"\nDescription: \n"+body+"\n\nStarts: "+txt+"\nEnds: "+txt2])
+                                 from_="+12014821965", body=[" \n"+subject+body+txt+txt2])
     else:
         message = client.messages.create(to="+14088405448",
-                                         from_="+12014821965", body=[txt+" "+subject])
+                                         from_="+12014821965", body=[" \n"+subject+txt+txt2])
     print("Message sent")
 
 
@@ -84,7 +84,7 @@ def main():
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+        calendarId='primary', timeMin=now, maxResults=2, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
@@ -135,28 +135,32 @@ def main():
         title = event['summary']
         location = event.get('location')
         woop = start
-        reminder = event['reminders']['overrides'][0]['minutes']
+            #reminder = event['reminders']['overrides'][0]['minutes']
+        '''^^^ The line above works but only for the first event and I'm not sure why'''
         #reminder = event['reminders']
         i+=i
 
-        starting ="Starts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
-        ending ="Ends: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
-        title="Event: "+title
-
+        starting ="\nStarts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
+        ending ="\nEnds: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
+        title="\nEvent: "+title
+        
+        '''Print code for testing'''
         print("")
-        print(reminder)
+        #print(reminder)
         print(starting)
         print(title)
         if description:
-            description ="Description: \n" + description
+            description ="\nDescription: \n" + description
             print(description)
         if location:
-            location ="Location: \n" + location
+            location ="\nLocation: " + location
             print(location)
         print(ending)
         print(datetime.datetime.now())
         print(" ")
-#sendSMS(starting,title,description,ending)
+
+        '''Make sure you change the phone # before testing the txt part'''
+        #sendSMS(starting,title,description,ending)
 
 
 if __name__ == '__main__':
