@@ -2,6 +2,7 @@
 from __future__ import print_function
 import httplib2
 import os
+from pprint import pprint
 
 from apiclient import discovery
 import oauth2client
@@ -9,28 +10,26 @@ from oauth2client import client
 from oauth2client import tools
 from twilio.rest import TwilioRestClient
 import datetime
+import time
+from time import strftime
 
 currentTime = datetime.datetime.now()
 print (str(currentTime))
 
 
-def sendSMS(list):
-
-
-    start = list['start'].get('dateTime', list['start'].get('date'))
-
-    print ("yeah")
-    #print(start, list['summary'])
-
+def sendSMS(subject, body, txt, txt2):
 
     account_sid = "AC6720dab93f0bfd755e38d5194e80889a"
     auth_token  = "cd0a979c74fdecb33d478f3ef2eca1bb"
     client = TwilioRestClient(account_sid, auth_token)
 
-    message = client.messages.create(body="sup",
-      to="+18317103519",    # Replace with your phone number
-      from_="+12014821837") # Replace with your Twilio number
-    print ("Message sent")#message.sid
+    if body:
+        message = client.messages.create(to="+18317103519",
+                                 from_="+12014821837", body=[" \n"+str(subject)+str(body)+str(txt)+str(txt2)])
+    else:
+        message = client.messages.create(to="+18317103519",
+                                         from_="+12014821837", body=[" \n"+str(subject)+str(txt)+str(txt2)])
+    print("Message sent")
 
 try:
     import argparse
@@ -43,7 +42,6 @@ except ImportError:
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
-
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -73,7 +71,6 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-
 def main():
     """Shows basic usage of the Google Calendar API.
 
@@ -87,17 +84,83 @@ def main():
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
+
         calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
-
+      
+    '''Time right now'''
+    
+    i=0
+    
     if not events:
         print('No upcoming events found.')
     for event in events:
-        sendSMS(event)
-        print ("event passed through")
-        #start = event['start'].get('dateTime', event['start'].get('date'))
-        #print(start, event['summary'])
+        '''Start time code'''
+        start = event['start'].get('dateTime', event['start'].get('date','description'))
+        syear = start[0:4]
+        smonth = start[5:7]
+        sday=start[8:10]
+        shour=start[11:13]
+        sminute=start[14:16]
+        shour=int(shour)
+        am = True
+        if shour > 12:
+            shour = shour-12
+            am = False
+        shour = str(shour)
+
+        '''End Time code'''
+        am2=True
+        end = event['end'].get('dateTime',event['end'].get('date'))
+        eyear = end[0:4]
+        emonth = end[5:7]
+        eday=end[8:10]
+        ehour=end[11:13]
+        eminute=end[14:16]
+        ehour=int(ehour)
+        if ehour > 12:
+            ehour = ehour-12
+            am2 = False
+        ehour = str(ehour)
+
+        if am2 ==True:
+            ToD = "am"
+        else:
+            ToD = "pm"
+
+        description = event.get('description')
+        date = event['start'].get('date','description')
+        #date.strftime('%m/%d/%Y')
+        title = event['summary']
+        location = event.get('location')
+        woop = start
+            #reminder = event['reminders']['overrides'][0]['minutes']
+        '''^^^ The line above works but only for the first event and I'm not sure why'''
+        #reminder = event['reminders']
+        i+=i
+
+        starting ="\nStarts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
+        ending ="\nEnds: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
+        title="\nEvent: "+title
+        
+        '''Print code for testing'''
+        print("")
+        #print(reminder)
+        print(starting)
+        print(title)
+        if description:
+            description ="\nDescription: \n" + description
+            print(description)
+        if location:
+            location ="\nLocation: " + location
+            print(location)
+        print(ending)
+        print(datetime.datetime.now())
+        print(" ")
+
+        '''Make sure you change the phone # before testing the txt part'''
+        sendSMS(starting,title,description,ending)
 
 if __name__ == '__main__':
     main()
