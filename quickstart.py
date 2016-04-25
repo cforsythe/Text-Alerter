@@ -1,3 +1,4 @@
+#http://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/
 from __future__ import print_function
 import httplib2
 import os
@@ -9,20 +10,23 @@ from oauth2client import tools
 from twilio.rest import TwilioRestClient
 import datetime
 
+currentTime = datetime.datetime.now()
+print (str(currentTime))
+
 
 def sendSMS(list):
-    
+
 
     start = list['start'].get('dateTime', list['start'].get('date'))
-    
-    print ("yeah")
-    print(start, list['summary'])
 
-    
+    print ("yeah")
+    #print(start, list['summary'])
+
+
     account_sid = "AC6720dab93f0bfd755e38d5194e80889a"
     auth_token  = "cd0a979c74fdecb33d478f3ef2eca1bb"
     client = TwilioRestClient(account_sid, auth_token)
-     
+
     message = client.messages.create(body="sup",
       to="+18317103519",    # Replace with your phone number
       from_="+12014821837") # Replace with your Twilio number
