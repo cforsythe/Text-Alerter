@@ -82,7 +82,7 @@ def main():
     service = discovery.build('calendar', 'v3', http=http)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
+    print('Getting the upcoming events')
     eventsResult = service.events().list(
         calendarId='primary', timeMin=now, maxResults=2, singleEvents=True,
         orderBy='startTime').execute()
@@ -131,22 +131,20 @@ def main():
 
         description = event.get('description')
         date = event['start'].get('date','description')
-        #date.strftime('%m/%d/%Y')
         title = event['summary']
         location = event.get('location')
         woop = start
-            #reminder = event['reminders']['overrides'][0]['minutes']
-        '''^^^ The line above works but only for the first event and I'm not sure why'''
-        #reminder = event['reminders']
-        i+=i
-
+        if event['reminders']['useDefault'] == False:
+            reminder = event['reminders']['overrides'][0]['minutes']
+        else:
+            reminder = "No Reminder"
+        print(reminder)
         starting ="\nStarts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
         ending ="\nEnds: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
         title="\nEvent: "+title
         
         '''Print code for testing'''
         print("")
-        #print(reminder)
         print(starting)
         print(title)
         if description:
