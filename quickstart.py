@@ -84,7 +84,7 @@ def main():
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming events')
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=2, singleEvents=True,
+        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
@@ -134,17 +134,41 @@ def main():
         title = event['summary']
         location = event.get('location')
         woop = start
-        if event['reminders']['useDefault'] == False:
-            reminder = event['reminders']['overrides'][0]['minutes']
-        else:
-            reminder = "No Reminder"
-        print(reminder)
+
         starting ="\nStarts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
         ending ="\nEnds: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
         title="\nEvent: "+title
+        if event['reminders']['useDefault'] == False:
+            reminder = event['reminders']['overrides'][0]['minutes']
+            shour = int(shour)
+            sminute = int(sminute)
+            rem = reminder
+            reminder = int(reminder)
+
+            def minutechange(minute,reminder):
+                minute = 60 - minute
+                reminder = minute - reminder
+                return reminder
         
+            if sminute < 30:
+                reminder = minutechange(sminute,reminder)
+            else:
+                reminder = sminute - reminder
+        
+            hour = shour - 1
+            if hour==0:
+                hour=12
+            ToR = str(hour) + ":" + str(reminder)
+            print("\n\nReminder asked to be",rem,"minutes before starting time.")
+            reminder = "Reminder will be at: "+ToR
+        else:
+            reminder = "\n\nNo Reminder"
+
+
+
         '''Print code for testing'''
-        print("")
+        
+        print(reminder)
         print(starting)
         print(title)
         if description:
@@ -154,8 +178,12 @@ def main():
             location ="\nLocation: " + location
             print(location)
         print(ending)
-        print(datetime.datetime.now())
-        print(" ")
+        print(time.strftime("%Y-%m-%d %H:%M"))
+        print("")
+
+#tleft= datetime.time() - datetime.time.now()
+
+#print(tleft)
 
         '''Make sure you change the phone # before testing the txt part'''
         #sendSMS(starting,title,description,ending)
