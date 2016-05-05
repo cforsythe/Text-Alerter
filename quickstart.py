@@ -6,11 +6,18 @@ from apiclient import discovery
 import oauth2client
 from oauth2client import client
 from oauth2client import tools
-from twilio.rest import TwilioRestClient
 import datetime
 import time
-import clock #forTimeChecking
 from time import strftime
+from twilio.rest import TwilioRestClient
+import clock #forTimeChecking
+
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
+
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
@@ -55,6 +62,7 @@ def main():
     counterOfEvents = 0
 
     """Shows basic usage of the Google Calendar API.
+
     Creates a Google Calendar API service object and outputs a list of the next
     10 events on the user's calendar.
     """
@@ -63,18 +71,17 @@ def main():
     service = discovery.build('calendar', 'v3', http=http)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('GETTING THE UPCOMING 10 EVENTS')
-    eventsResult = service.events().list(calendarId='primary', timeMin=now, maxResults=10, singleEvents=True, orderBy='startTime').execute()
-
+    print('GETTING THE UPCOMING EVENTS')
+    eventsResult = service.events().list(
+        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+        orderBy='startTime').execute()
     events = eventsResult.get('items', [])
-      
+
     '''Time right now'''
-    
     i=0
     
     if not events:
         print('No upcoming events found.')
-
     for event in events:
         '''Start time code'''
         start = event['start'].get('dateTime', event['start'].get('date','description'))
@@ -85,8 +92,6 @@ def main():
         sminute=start[14:16]
         shour=int(shour)
         am = True
-
-        
         if shour > 12:
             shour = shour-12
             am = False
@@ -116,80 +121,101 @@ def main():
         title = event['summary']
         location = event.get('location')
         woop = start
-        '''^^^ The line above works but only for the first event and I'm not sure why'''  
-       
-        i+=i
-        
-        #starting ="START: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD 
-        #ending ="ENDS: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD 
 
         starting ="START: "+shour+":"+sminute+ToD 
         ending ="ENDS: "+ehour+":"+eminute+ToD 
         title="EVENT: "+title
 
         
-        
-        '''Print code for testing'''
-        #print("")
-        
-        print(starting)
-        print(title)
-        if description:
-            description ="Description: " + description
-            print(description)
-        elif (str(event.get('description')) == "None"):
-            description = "No Description Entered"
-            print(description)
-        if location:
-            location ="Location: " + location 
-            print(location)
-        print(ending)
-        #print(datetime.datetime.now())
-        print(" ")
 
-        reminder = event.get('reminders')
-        reminder = event['reminders']
-        reminder = str(reminder)
-        minutesBeforeReminder = int(reminder[29:31])
-        print("Minutes to be reminded before Event", minutesBeforeReminder)
+        #starting ="\nStarts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
+        #ending ="\nEnds: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
+        #title="\nEvent: "+title
+        if event['reminders']['useDefault'] == False:
+        	counterOfEvents = counterOfEvents + 1
+        	minutesBeforeReminder = int(event['reminders']['overrides'][0]['minutes'])
+        	hoursReminder = int(shour)
+        	minutesReminder = int(sminute)
 
-        hoursReminder = int(shour)
-        minutesReminder = int(sminute)
-        
-        if (minutesBeforeReminder > minutesReminder):
-            minutesReminder = minutesReminder + 60
-            hoursReminder = hoursReminder - 1
+        	if(minutesBeforeReminder >= 60):
+        		useHoursMinutes = True
+        		hoursBeforeReminder = minutesBeforeReminder / 60
+        		minutesBeforeReminder = (minutesBeforeReminder % 60) 
 
-        minutesReminder = minutesReminder - minutesBeforeReminder
+        	if(minutesBeforeReminder >= minutesReminder):
+        		minutesReminder = minutesReminder + 60
+        		hoursReminder = hoursReminder - 1
 
-        print("calculated time")
-        if(minutesReminder < 10):
-            if(ToD == " PM"):
-                timeToBeReminded = (hoursReminder + 12)+":0"+ str(minutesReminder)
-            else:
-                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
-        else:
-            if(ToD == " PM"):
-                timeToBeReminded = str(hoursReminder + 12)+":"+ str(minutesReminder)
-            else:
-                timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
+        	if(useHoursMinutes):
+        		useHoursMinutes = False
+        		minutesReminder = minutesReminder - minutesBeforeReminder
+        		hoursReminder = hoursReminder - hoursBeforeReminder
+        	else:
+        		minutesReminder = minutesReminder - minutesBeforeReminder
 
+        	if(minutesReminder < 10):
+        		if(ToD == " PM"):
+        			timeToBeReminded = str(hoursReminder + 12)+":0"+ str(minutesReminder)
+        		else:
+        			timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
+        	else:
+        		if(ToD == " PM"):
+        			timeToBeReminded = str(hoursReminder + 12)+":"+ str(minutesReminder)
+        		else:
+        			timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
+        	listOfReminderTimes.append(timeToBeReminded)
+    		listOfStarting.append(starting)
+    		listOfTitle.append(title)
+    		listOfDescription.append(description)
+    		listOfEnding.append(ending)  
+	        #'''Print code for testing'''
+	        print(starting)
+	        print(title)
+	        if description:
+	            description ="Description: " + description
+	            print(description)
 
-        listOfReminderTimes.append(timeToBeReminded)
-        listOfStarting.append(starting)
-        listOfTitle.append(title)
-        listOfDescription.append(description)
-        listOfEnding.append(ending)
-        print(timeToBeReminded + ToD)
+	        elif (str(event.get('description')) == "None"):
+	            description = "No Description Entered"
+	            print(description)
+	        if location:
+	            location ="Location: " + location 
+	            print(location)
+	        print(ending)
 
-        
-        print ("the counterOfEvents ", counterOfEvents)
-        counterOfEvents = counterOfEvents + 1
-        print(" ")
-        '''Make sure you change the phone # before testing the txt part'''
-        #messageSender.sendSMS(starting,title,description,ending)
-    print(counterOfEvents)
+	        print(" ")
+	       
+	        print (minutesBeforeReminder)
+	        print("Minutes to be reminded before Event", minutesBeforeReminder)
+	        print("calculated time")
+	        if(minutesReminder < 10):
+	            if(ToD == " PM"):
+	                timeToBeReminded = str(hoursReminder + 12)+":0"+ str(minutesReminder)
+	            else:
+	                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
+	        else:
+	            if(ToD == " PM"):
+	                timeToBeReminded = str(hoursReminder + 12)+":"+ str(minutesReminder)
+	            else:
+	                timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
+
+	        print(timeToBeReminded + ToD)
+
+	        
+	        print ("the counterOfEvents ", counterOfEvents)
+	        
+	        print(" ")
+
+    	else:
+        	reminder = "\n\nNo Reminder"
+        	 
     clock.alerter(listOfReminderTimes, listOfStarting, listOfTitle, listOfDescription,listOfEnding, counterOfEvents)
+#tleft= datetime.time() - datetime.time.now()
+
+#print(tleft)
+
+        #'''Make sure you change the phone # before testing the txt part'''
+        #sendSMS(starting,title,description,ending)
 
 if __name__ == '__main__':
     main()

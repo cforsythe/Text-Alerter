@@ -13,12 +13,12 @@ def alerter(listReminderTimes, listStarting, listTitle, listDescritption, listEn
 			if(time == listReminderTimes[ix]):
 				print("alert")
 				if(numElements == 1):
-					messageSender.sendSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
+					messageSender.sendLouisSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
 					numElements = numElements - 1
 					print("num Elements", numElements)
 
 				elif(numElements == 2):
-					messageSender.sendSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
+					messageSender.sendLouisSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
 					listReminderTimes[ix] = listReminderTimes[ix+1]
 					listTitle[ix] = listTitle[ix+1]
 					listStarting[ix] = listStarting[ix+1]
@@ -28,7 +28,7 @@ def alerter(listReminderTimes, listStarting, listTitle, listDescritption, listEn
 					print("num Elements", numElements)
 
 				elif(numElements > 2 and numElements <= 10):
-					messageSender.sendSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
+					messageSender.sendLouisSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
 					listReminderTimes[ix] = "0:00"
 					numElements = numElements - 1
 					shouldShiftLeft = True
