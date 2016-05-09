@@ -24,7 +24,8 @@ def directions(starting,destination):
 
     with open('directions.json') as data_file:
         data = json.load(data_file)
-
+    
+    str = ['Directions: \n']
 
     if data["status"]=="ZERO_RESULTS":
         print("Invalid Address")
@@ -33,8 +34,12 @@ def directions(starting,destination):
 
         for i in range(0,length):
             directions = data['routes'][0]['legs'][0]['steps'][i]['html_instructions']
-            str(directions)
             directions=directions.replace('</b>','')
             directions = directions.replace('<b>','')
-            return directions
-
+            new = directions + " "
+            str.append(new)
+    return str
+#starting ="Monterey,ca"
+#destination="Hollister,ca"
+#str = directions(starting,destination)
+#print(str)
