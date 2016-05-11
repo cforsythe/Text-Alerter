@@ -217,12 +217,11 @@ def main():
 #			append = True
 #			print("APPENDED")
 
-		if(append==True):
-			listOfReminderTimes.append(timeToBeReminded)
-			listOfStarting.append(starting)
-			listOfTitle.append(title)
-			listOfDescription.append(description)
-			listOfEnding.append(ending)
+        listOfReminderTimes.append(timeToBeReminded)
+        listOfStarting.append(starting)
+        listOfTitle.append(title)
+        listOfDescription.append(description)
+        listOfEnding.append(ending)
 
         '''Print code for testing'''
         print(starting)
