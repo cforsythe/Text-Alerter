@@ -210,7 +210,7 @@ def main():
 
 		append = True
 
-#		if (timeDigits)==abs(int(hoursReminder)-1) and str(eventDate)==str(time[0:10]):
+#		if (timeDigits)abs(int(hoursReminder)-1) and str(eventDate)==str(time[0:10]):
 #			append = False
 #			print("FALSE")
 #		else:
