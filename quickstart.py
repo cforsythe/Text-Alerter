@@ -187,7 +187,7 @@ def main():
                 if hoursReminder==0:
                     hoursReminder=12
                 hoursReminder = abs(hoursReminder)
-                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
+                timeToBeReminded = str(hoursReminder+12)+":0"+ str(minutesReminder)
             else:
                 timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
         else:
@@ -199,7 +199,7 @@ def main():
                 if hoursReminder==0:
                     hoursReminder=12
                 hoursReminder=abs(hoursReminder)
-                timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
+                timeToBeReminded = str(hoursReminder+12)+":"+ str(minutesReminder)
             else:
                 timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
 
