@@ -93,8 +93,6 @@ def main():
         time = str(datetime.datetime.now())
         time = time[0:10]
         eventDate=syear+"-"+smonth+"-"+sday
-#        if(str(eventDate)==str(time)):
-#            print("YAYYAYAYAYAYAYAYYAA")
 
         if shour:
             shour=int(shour)
@@ -153,11 +151,17 @@ def main():
         useHoursMinutes = False
         time = str(datetime.datetime.now())
         time = time[11:16]
+        counterOfEvents = counterOfEvents + 1
+
         if event['reminders']['useDefault'] == False:
-            counterOfEvents = counterOfEvents + 1
             minutesBeforeReminder = int(event['reminders']['overrides'][0]['minutes'])
             hoursReminder = int(shour)
             minutesReminder = int(sminute)
+        else:
+            minutesBeforeReminder = 30
+            hoursReminder=int(shour)
+            minutesReminder=int(sminute)
+
         if(minutesBeforeReminder >= 60):
             useHoursMinutes = True
             hoursBeforeReminder = minutesBeforeReminder / 60
