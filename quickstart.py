@@ -185,7 +185,7 @@ def main():
         print("the tod is ", ToD)
         print("the shour ", shour)
         print("the sminute ", sminute)
-        if ToD==" AM":
+        if ToD==" AM" and shour == 0:
             hoursReminder = 0 
             minutesReminder = minutesReminder
             flag = True
@@ -200,8 +200,10 @@ def main():
             elif(flag): 
                 timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
                 flag = False
+            elif shour >= 10:
+            	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
-                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
+                timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
         else:
             if minutesReminder==60:
@@ -216,8 +218,10 @@ def main():
             elif (flag): 
                 timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
                 flag = False
+            elif shour >= 10:
+            	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
-                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
+                timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
 		timeNew = str(datetime.datetime.now())
 		
