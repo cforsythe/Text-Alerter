@@ -103,7 +103,7 @@ def main():
         if shour:
             shour=int(shour)
         else:
-            shour=12
+            shour=0
 
         if sminute:
             sminute=sminute
@@ -164,7 +164,7 @@ def main():
             hoursReminder = int(shour)
             minutesReminder = int(sminute)
         else:
-            minutesBeforeReminder = 30
+            minutesBeforeReminder = 0
             hoursReminder=int(shour)
             minutesReminder=int(sminute)
 
@@ -186,52 +186,56 @@ def main():
         print("the tod is ", ToD)
         print("the shour ", shour)
         print("the sminute ", sminute)
+        print("minutes reminder", minutesReminder)
         if ToD==" AM" and shour == 0:
             hoursReminder = 0 
             minutesReminder = minutesReminder
             flag = True
 
         if(minutesReminder <= 10):
+            if str(minutesReminder)=="00":
+                minutesReminder=30
             if(ToD == " PM"):
                 hoursReminder=hoursReminder
-                if hoursReminder==0:
-                    hoursReminder=12
                 hoursReminder = abs(hoursReminder)
                 timeToBeReminded = str(hoursReminder+12)+":0"+ str(minutesReminder)
+                if hoursReminder==0:
+                    hoursReminder=12
             elif(flag): 
                 timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
                 flag = False
             elif shour >= 10:
+                if shour==12 and ToD==" AM":
+                    hoursReminder=shour
+                    minutesReminder=str(minutesReminder)
+                    minutesReminder="00"
             	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
                 timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
         else:
+            #Hour Reminder
             if minutesReminder==60:
                 minutesReminder=str(minutesReminder)
                 minutesReminder="00"
             if(ToD == " PM"):
                 hoursReminder=hoursReminder
-                if hoursReminder==0:
-                    hoursReminder=12
                 hoursReminder=abs(hoursReminder)
                 timeToBeReminded = str(hoursReminder+12)+":"+ str(minutesReminder)
-            elif (flag): 
-                timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
+                if hoursReminder==0:
+                    hoursReminder=12
+            elif (flag):
+                timeToBeReminded = "0"+str(hoursReminder)+"0:"+ str(minutesReminder)
                 flag = False
-            elif shour >= 10:
+            elif shour > 10:
+                if shour==12 and ToD==" AM":
+                    hoursReminder = shour
+                    minutesReminder=str(minutesReminder)
+                    minutesReminder="00"
             	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
                 timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
-		timeNew = str(datetime.datetime.now())
-		
-		if timeNew[11:13]=='00':
-			timeDigits=12
-			timeMin=int(timeNew[14:16])
-		else:
-			timeDigits = int(timeNew[11:13])
-			timeMin = int(timeNew[14:16])
 
 
         listOfReminderTimes.append(timeToBeReminded)
