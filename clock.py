@@ -1,38 +1,60 @@
 import quickstart
 import datetime
 import messageSender
+import time
 
-def alerter(listReminderTimes, listStarting, listTitle, listDescritption, listEnding, numElements):
-	shouldShiftLeft = False
-	print("Beginning of function")
+
+counterOfMessages = 0
+counterOfMessagesList = []
+hourOfMessagesList = []
+outputFile = open('flatFileDatabase.txt', 'a')
+
+def alerter(listReminderTimes, listDates, listStarting, listTitle, listDescription, listEnding, numElements):
+	
+	
+    print("Beginning of function")
 	#while(True):
-	time = str(datetime.datetime.now())
-	time = time[11:16]
-	getStuckInLoop = False
-	shouldSendMessage = False
+    currentTime = str(datetime.datetime.now())
+    currentDate = currentTime[0:10]
+    currentTime = currentTime[11:16]
+    getStuckInLoop = False
+    shouldSendMessage = False
+    indexNeeded = 0
+	
+    for ix in range(0, len(listReminderTimes)):
+        print("current time ", currentTime, "reminder time ", listReminderTimes[ix], "List Starting", str(listDates[ix]))
+        if(currentTime == listReminderTimes[ix] and str(currentDate)==str(listDates[ix])):
+            indexNeeded = ix
+            shouldSendMessage = True
+            global counterOfMessages
+            counterOfMessages = counterOfMessages + 1
 
-	#for 0 in range(0, numElements):
-    #print(time , listReminderTimes[0])
-	if(time == listReminderTimes[0]):
-		shouldSendMessage = True
+            orderedPair = str(listReminderTimes[ix][0:2]) + "," + str(counterOfMessages) + "\n"
+            outputFile.write(orderedPair)
+			#print( "the hour", listReminderTimes[ix][0:2])
 
-	if(shouldSendMessage):
-		messageSender.sendLouisSMS(listTitle[0], listStarting[0], listEnding[0], listDescritption[0])
-		#print("Message sent!")
-		shouldSendMessage = False
-		getStuckInLoop = True
+			
 
-	while(getStuckInLoop):
-		time = str(datetime.datetime.now())
-		time = time[11:16]
-		print("stuck in loop")
-		print("the time", time)
-		print ("the reminder time ", listReminderTimes[0])
-		if(time != listReminderTimes[0]):
+    if(shouldSendMessage):
+        messageSender.sendLouisSMS(listTitle[indexNeeded], listStarting[indexNeeded], listEnding[indexNeeded], listDescription[indexNeeded])
+        print("Message sent!")
+        shouldSendMessage = False
+        getStuckInLoop = True
+		#time.sleep(55)
+
+	
+    while(getStuckInLoop):
+        currentTime = str(datetime.datetime.now())
+        currentTime = currentTime[11:16]
+        print("stuck in loop")
+        print("the time", currentTime)
+        print ("the reminder time ", listReminderTimes[indexNeeded])
+        if(currentTime != listReminderTimes[indexNeeded]):
 			getStuckInLoop = False
 
+	
 
+	#time.sleep(30)
+    quickstart.main()
 
-	quickstart.main()
-        
-	print("End of function")
+    print("End of function")

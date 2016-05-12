@@ -21,11 +21,13 @@ except ImportError:
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
+
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 def get_credentials():
+
     """Gets valid user credentials from storage.
         
         If nothing has been stored, or if the stored credentials are invalid,
@@ -53,7 +55,9 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
+
 def main():
+
     listOfReminderTimes = []
     listOfTitle = []
     listOfStarting = []
@@ -62,7 +66,9 @@ def main():
     counterOfEvents = 0
     listOfNumberEvents = []
     listOfHour = []
+    listOfDates = []
     go = True
+    flag = False
     
     """Shows basic usage of the Google Calendar API.
         
@@ -166,6 +172,7 @@ def main():
             useHoursMinutes = True
             hoursBeforeReminder = minutesBeforeReminder / 60
             minutesBeforeReminder = (minutesBeforeReminder % 60)
+            print("minutes b4 reminder", minutesBeforeReminder)
         if(minutesBeforeReminder >= minutesReminder):
             minutesReminder = minutesReminder + 60
             hoursReminder = hoursReminder-1
@@ -176,10 +183,13 @@ def main():
             hoursReminder = hoursReminder - hoursBeforeReminder
         else:
             minutesReminder = minutesReminder - minutesBeforeReminder
-
-        if shour==12 and ToD==" AM":
-            hoursReminder = 12
-            minutesReminder = 0
+        print("the tod is ", ToD)
+        print("the shour ", shour)
+        print("the sminute ", sminute)
+        if ToD==" AM" and shour == 0:
+            hoursReminder = 0 
+            minutesReminder = minutesReminder
+            flag = True
 
         if(minutesReminder <= 10):
             if(ToD == " PM"):
@@ -188,8 +198,14 @@ def main():
                     hoursReminder=12
                 hoursReminder = abs(hoursReminder)
                 timeToBeReminded = str(hoursReminder+12)+":0"+ str(minutesReminder)
+            elif(flag): 
+                timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
+                flag = False
+            elif shour >= 10:
+            	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
-                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
+                timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
+
         else:
             if minutesReminder==60:
                 minutesReminder=str(minutesReminder)
@@ -200,8 +216,13 @@ def main():
                     hoursReminder=12
                 hoursReminder=abs(hoursReminder)
                 timeToBeReminded = str(hoursReminder+12)+":"+ str(minutesReminder)
+            elif (flag): 
+                timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
+                flag = False
+            elif shour >= 10:
+            	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
-                timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
+                timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
 		timeNew = str(datetime.datetime.now())
 		
@@ -212,20 +233,13 @@ def main():
 			timeDigits = int(timeNew[11:13])
 			timeMin = int(timeNew[14:16])
 
-		append = True
-
-#		if (timeDigits)abs(int(hoursReminder)-1) and str(eventDate)==str(time[0:10]):
-#			append = False
-#			print("FALSE")
-#		else:
-#			append = True
-#			print("APPENDED")
 
         listOfReminderTimes.append(timeToBeReminded)
         listOfStarting.append(starting)
         listOfTitle.append(title)
         listOfDescription.append(description)
         listOfEnding.append(ending)
+        listOfDates.append(eventDate)
 
         '''Print code for testing'''
         print(starting)
@@ -254,7 +268,7 @@ def main():
     else:
         reminder = "\n\nNo Reminder"
 
-    clock.alerter(listOfReminderTimes, listOfStarting, listOfTitle, listOfDescription,listOfEnding,counterOfEvents)
+    clock.alerter(listOfReminderTimes, listOfDates, listOfStarting, listOfTitle, listOfDescription,listOfEnding,counterOfEvents)
 
 if __name__ == '__main__':
     main()
