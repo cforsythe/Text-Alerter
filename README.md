@@ -11,6 +11,6 @@ Summary:  This program will grab a user's 10 upcoming events through the use of 
 
 Future Work:
 Improve reminder time calcualtion  /
-Allow other users to use service/
+Allow other users to use service /
 Improve user interaction /
 Make GUI better by adding live graphs
