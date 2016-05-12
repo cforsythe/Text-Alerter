@@ -57,7 +57,7 @@ def get_credentials():
 
 
 def main():
-
+	#Lists are needed to store text message data
     listOfReminderTimes = []
     listOfTitle = []
     listOfStarting = []
@@ -93,6 +93,7 @@ def main():
         smonth = start[5:7]
         sday=start[8:10]
         shour=start[11:13]
+        print("the shour ", shour)
         sminute=start[14:16]
 		
         time = str(datetime.datetime.now())
@@ -183,7 +184,7 @@ def main():
         else:
             minutesReminder = minutesReminder - minutesBeforeReminder
         print("the tod is ", ToD)
-        print("the shour ", shour)
+        
         print("the sminute ", sminute)
         if ToD==" AM" and shour == 0:
             hoursReminder = 0 
@@ -197,30 +198,45 @@ def main():
                     hoursReminder=12
                 hoursReminder = abs(hoursReminder)
                 timeToBeReminded = str(hoursReminder+12)+":0"+ str(minutesReminder)
-            elif(flag): 
+
+            elif(flag):
+            	print("1") 
                 timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
                 flag = False
             elif shour >= 10:
+            	print("2")
             	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
             else:
+            	print("3")
                 timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
         else:
+        	#Hour Reminder
             if minutesReminder==60:
                 minutesReminder=str(minutesReminder)
                 minutesReminder="00"
-            if(ToD == " PM"):
+
+            if(ToD == " PM" and shour > 12):
                 hoursReminder=hoursReminder
                 if hoursReminder==0:
                     hoursReminder=12
                 hoursReminder=abs(hoursReminder)
-                timeToBeReminded = str(hoursReminder+12)+":"+ str(minutesReminder)
+
+                print("4")
+                timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)#THIS IS CAUSING PROBLEM <--------------------------------------------------------------------------------------
+                #PROBLEM PROBLEM PROBLEM
+
+                
+
             elif (flag): 
+            	print("5")
                 timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
                 flag = False
-            elif shour >= 10:
-            	timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
+            elif shour > 9:
+            	timeToBeReminded =  str(hoursReminder)+":"+ str(minutesReminder)
+
             else:
+            	print("7")
                 timeToBeReminded = "0" + str(hoursReminder)+":"+ str(minutesReminder)
 
 		timeNew = str(datetime.datetime.now())
