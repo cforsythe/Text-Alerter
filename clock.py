@@ -36,7 +36,7 @@ def alerter(listReminderTimes, listDates, listStarting, listTitle, listDescripti
 			
 
     if(shouldSendMessage):
-        messageSender.sendLouisSMS(listTitle[indexNeeded], listStarting[indexNeeded], listEnding[indexNeeded], listDescription[indexNeeded])
+        messageSender.sendLouisSMS(str(listDates[indexNeeded]), listTitle[indexNeeded], listStarting[indexNeeded], listEnding[indexNeeded], listDescription[indexNeeded])
         print("Message sent!")
         shouldSendMessage = False
         getStuckInLoop = True
