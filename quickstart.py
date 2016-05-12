@@ -21,19 +21,21 @@ except ImportError:
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
+
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 def get_credentials():
+
     """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Returns:
+        
+        If nothing has been stored, or if the stored credentials are invalid,
+        the OAuth2 flow is completed to obtain the new credentials.
+        
+        Returns:
         Credentials, the obtained credential.
-    """
+        """
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
@@ -53,33 +55,35 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
+
 def main():
+
     listOfReminderTimes = []
     listOfTitle = []
     listOfStarting = []
     listOfDescription = []
     listOfEnding = []
     counterOfEvents = 0
-
+    listOfNumberEvents = []
+    listOfHour = []
+    go = True
+    flag = False
+    
     """Shows basic usage of the Google Calendar API.
-
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
-    """
+        
+        Creates a Google Calendar API service object and outputs a list of the next
+        10 events on the user's calendar.
+        """
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
-
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('GETTING THE UPCOMING EVENTS')
-    eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
-        orderBy='startTime').execute()
-    events = eventsResult.get('items', [])
-
-    '''Time right now'''
-    i=0
     
+    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    print('\nGETTING THE UPCOMING EVENTS\n')
+    eventsResult = service.events().list(calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,orderBy='startTime').execute()
+    events = eventsResult.get('items', [])
+                                         
+	#Time right now
     if not events:
         print('No upcoming events found.')
     for event in events:
@@ -90,13 +94,27 @@ def main():
         sday=start[8:10]
         shour=start[11:13]
         sminute=start[14:16]
-        shour=int(shour)
+		
+        time = str(datetime.datetime.now())
+        time = time[0:10]
+        eventDate=syear+"-"+smonth+"-"+sday
+
+        if shour:
+            shour=int(shour)
+        else:
+            shour=12
+
+        if sminute:
+            sminute=sminute
+        else:
+            sminute=10
+
         am = True
         if shour > 12:
             shour = shour-12
             am = False
-        shour = str(shour)
-
+            shour = str(shour)
+                                                                                                 
         '''End Time code'''
         am2=True
         end = event['end'].get('dateTime',event['end'].get('date'))
@@ -105,13 +123,22 @@ def main():
         eday=end[8:10]
         ehour=end[11:13]
         eminute=end[14:16]
-        ehour=int(ehour)
+        if ehour:
+            ehour=int(ehour)
+        else:
+            ehour=11
+            am2=False
+        if eminute:
+            eminute = eminute
+        else:
+            eminute = 59
+
         if ehour > 12:
             ehour = ehour-12
             am2 = False
-        ehour = str(ehour)
+            ehour = str(ehour)
 
-        if am2 ==True:
+        if (am2 ==True) or (am ==True):
             ToD = " AM"
         else:
             ToD = " PM"
@@ -122,100 +149,120 @@ def main():
         location = event.get('location')
         woop = start
 
-        starting ="START: "+shour+":"+sminute+ToD 
-        ending ="ENDS: "+ehour+":"+eminute+ToD 
+        starting ="START: "+str(shour)+":"+str(sminute)+str(ToD)
+        ending ="ENDS: "+str(ehour)+":"+str(eminute)+str(ToD)
         title="EVENT: "+title
 
-        
+        useHoursMinutes = False
+        time = str(datetime.datetime.now())
+        time = time[11:16]
+        counterOfEvents = counterOfEvents + 1
 
-        #starting ="\nStarts: "+smonth+"/"+sday+"/"+syear+" "+shour+":"+sminute+ToD
-        #ending ="\nEnds: "+emonth+"/"+eday+"/"+eyear+" "+ehour+":"+eminute+ToD+"\n"
-        #title="\nEvent: "+title
         if event['reminders']['useDefault'] == False:
-        	counterOfEvents = counterOfEvents + 1
-        	minutesBeforeReminder = int(event['reminders']['overrides'][0]['minutes'])
-        	hoursReminder = int(shour)
-        	minutesReminder = int(sminute)
+            minutesBeforeReminder = int(event['reminders']['overrides'][0]['minutes'])
+            hoursReminder = int(shour)
+            minutesReminder = int(sminute)
+        else:
+            minutesBeforeReminder = 30
+            hoursReminder=int(shour)
+            minutesReminder=int(sminute)
 
-        	if(minutesBeforeReminder >= 60):
-        		useHoursMinutes = True
-        		hoursBeforeReminder = minutesBeforeReminder / 60
-        		minutesBeforeReminder = (minutesBeforeReminder % 60) 
+        if(minutesBeforeReminder >= 60):
+            useHoursMinutes = True
+            hoursBeforeReminder = minutesBeforeReminder / 60
+            minutesBeforeReminder = (minutesBeforeReminder % 60)
+            print("minutes b4 reminder", minutesBeforeReminder)
+        if(minutesBeforeReminder >= minutesReminder):
+            minutesReminder = minutesReminder + 60
+            hoursReminder = hoursReminder-1
 
-        	if(minutesBeforeReminder >= minutesReminder):
-        		minutesReminder = minutesReminder + 60
-        		hoursReminder = hoursReminder - 1
+        if(useHoursMinutes):
+            useHoursMinutes = False
+            minutesReminder = minutesReminder - minutesBeforeReminder
+            hoursReminder = hoursReminder - hoursBeforeReminder
+        else:
+            minutesReminder = minutesReminder - minutesBeforeReminder
+        print("the tod is ", ToD)
+        print("the shour ", shour)
+        print("the sminute ", sminute)
+        if ToD==" AM":
+            hoursReminder = 0 
+            minutesReminder = minutesReminder
+            flag = True
 
-        	if(useHoursMinutes):
-        		useHoursMinutes = False
-        		minutesReminder = minutesReminder - minutesBeforeReminder
-        		hoursReminder = hoursReminder - hoursBeforeReminder
-        	else:
-        		minutesReminder = minutesReminder - minutesBeforeReminder
+        if(minutesReminder <= 10):
+            if(ToD == " PM"):
+                hoursReminder=hoursReminder
+                if hoursReminder==0:
+                    hoursReminder=12
+                hoursReminder = abs(hoursReminder)
+                timeToBeReminded = str(hoursReminder+12)+":0"+ str(minutesReminder)
+            elif(flag): 
+                timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
+                flag = False
+            else:
+                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
 
-        	if(minutesReminder < 10):
-        		if(ToD == " PM"):
-        			timeToBeReminded = str(hoursReminder + 12)+":0"+ str(minutesReminder)
-        		else:
-        			timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
-        	else:
-        		if(ToD == " PM"):
-        			timeToBeReminded = str(hoursReminder + 12)+":"+ str(minutesReminder)
-        		else:
-        			timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
-        	listOfReminderTimes.append(timeToBeReminded)
-    		listOfStarting.append(starting)
-    		listOfTitle.append(title)
-    		listOfDescription.append(description)
-    		listOfEnding.append(ending)  
-	        #'''Print code for testing'''
-	        print(starting)
-	        print(title)
-	        if description:
-	            description ="Description: " + description
-	            print(description)
+        else:
+            if minutesReminder==60:
+                minutesReminder=str(minutesReminder)
+                minutesReminder="00"
+            if(ToD == " PM"):
+                hoursReminder=hoursReminder
+                if hoursReminder==0:
+                    hoursReminder=12
+                hoursReminder=abs(hoursReminder)
+                timeToBeReminded = str(hoursReminder+12)+":"+ str(minutesReminder)
+            elif (flag): 
+                timeToBeReminded = str(hoursReminder)+"0:"+ str(minutesReminder)
+                flag = False
+            else:
+                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
 
-	        elif (str(event.get('description')) == "None"):
-	            description = "No Description Entered"
-	            print(description)
-	        if location:
-	            location ="Location: " + location 
-	            print(location)
-	        print(ending)
+		timeNew = str(datetime.datetime.now())
+		
+		if timeNew[11:13]=='00':
+			timeDigits=12
+			timeMin=int(timeNew[14:16])
+		else:
+			timeDigits = int(timeNew[11:13])
+			timeMin = int(timeNew[14:16])
 
-	        print(" ")
-	       
-	        print (minutesBeforeReminder)
-	        print("Minutes to be reminded before Event", minutesBeforeReminder)
-	        print("calculated time")
-	        if(minutesReminder < 10):
-	            if(ToD == " PM"):
-	                timeToBeReminded = str(hoursReminder + 12)+":0"+ str(minutesReminder)
-	            else:
-	                timeToBeReminded = str(hoursReminder)+":0"+ str(minutesReminder)
-	        else:
-	            if(ToD == " PM"):
-	                timeToBeReminded = str(hoursReminder + 12)+":"+ str(minutesReminder)
-	            else:
-	                timeToBeReminded = str(hoursReminder)+":"+ str(minutesReminder)
 
-	        print(timeToBeReminded + ToD)
+        listOfReminderTimes.append(timeToBeReminded)
+        listOfStarting.append(starting)
+        listOfTitle.append(title)
+        listOfDescription.append(description)
+        listOfEnding.append(ending)
 
-	        
-	        print ("the counterOfEvents ", counterOfEvents)
-	        
-	        print(" ")
+        '''Print code for testing'''
+        print(starting)
+        print(title)
+        if description:
+            description ="Description: " + description
+            print(description)
+                                                                                                                                                                                                                                                                                                                                                                             
+        elif (str(event.get('description')) == "None"):
+            description = "No Description Entered"
+            print(description)
+        if location:
+            location ="Location: " + location
+            print(location)
+        print(ending)
+                                                                                                                                                                                                                                                                                                                                                                                                         
+        print(" ")
 
-    	else:
-        	reminder = "\n\nNo Reminder"
-        	 
-    clock.alerter(listOfReminderTimes, listOfStarting, listOfTitle, listOfDescription,listOfEnding, counterOfEvents)
-#tleft= datetime.time() - datetime.time.now()
+        print (minutesBeforeReminder)
+        #print("Minutes to be reminded before Event", minutesBeforeReminder)
+        print("calculated time ", timeToBeReminded + ToD)
 
-#print(tleft)
+        print ("the counterOfEvents ", counterOfEvents)
+        listOfNumberEvents.append(counterOfEvents)
+        print(" ")
+    else:
+        reminder = "\n\nNo Reminder"
 
-        #'''Make sure you change the phone # before testing the txt part'''
-        #sendSMS(starting,title,description,ending)
+    clock.alerter(listOfReminderTimes, listOfStarting, listOfTitle, listOfDescription,listOfEnding,counterOfEvents)
 
 if __name__ == '__main__':
     main()

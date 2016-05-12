@@ -1,46 +1,59 @@
 import quickstart
 import datetime
 import messageSender
+import time
+
+
+counterOfMessages = 0
+counterOfMessagesList = []
+hourOfMessagesList = []
+outputFile = open('flatFileDatabase.txt', 'a')
 
 def alerter(listReminderTimes, listStarting, listTitle, listDescritption, listEnding, numElements):
-	shouldShiftLeft = False
+	
+	
 	print("Beginning of function")
-	while(True):
-		time = str(datetime.datetime.now())
-		time = time[11:16]
-		for ix in range(0, numElements):
-			#print(time , listReminderTimes[ix])
-			if(time == listReminderTimes[ix]):
-				print("alert")
-				if(numElements == 1):
-					messageSender.sendLouisSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
-					numElements = numElements - 1
-					print("num Elements", numElements)
+	#while(True):
+	currentTime = str(datetime.datetime.now())
+	currentTime = currentTime[11:16]
+	getStuckInLoop = False
+	shouldSendMessage = False
+	indexNeeded = 0
+	
+	for ix in range(0, len(listReminderTimes)):
+		print("current time ", currentTime, "reminder time ", listReminderTimes[ix])
+		if(currentTime == listReminderTimes[ix]):
+			indexNeeded = ix
+			shouldSendMessage = True
+			global counterOfMessages
+			counterOfMessages = counterOfMessages + 1
+			
+			orderedPair = str(listReminderTimes[ix][0:2]) + "," + str(counterOfMessages) + "\n"
+			outputFile.write(orderedPair)
+			#print( "the hour", listReminderTimes[ix][0:2])
 
-				elif(numElements == 2):
-					messageSender.sendLouisSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
-					listReminderTimes[ix] = listReminderTimes[ix+1]
-					listTitle[ix] = listTitle[ix+1]
-					listStarting[ix] = listStarting[ix+1]
-					listEnding[ix] = listEnding[ix+1]
-					listDescritption[ix] = listDescritption[ix+1]
-					numElements = numElements - 1
-					print("num Elements", numElements)
+			
 
-				elif(numElements > 2 and numElements <= 10):
-					messageSender.sendLouisSMS(listTitle[ix], listStarting[ix], listEnding[ix], listDescritption[ix])
-					listReminderTimes[ix] = "0:00"
-					numElements = numElements - 1
-					shouldShiftLeft = True
-					print("num Elements", numElements)
+	if(shouldSendMessage):
+		messageSender.sendLouisSMS(listTitle[indexNeeded], listStarting[indexNeeded], listEnding[indexNeeded], listDescritption[indexNeeded])
+		print("Message sent!")
+		shouldSendMessage = False
+		getStuckInLoop = True
+		#time.sleep(55)
 
-		if(shouldShiftLeft):
-			for jx in range(0, numElements):
-				listReminderTimes[jx] = listReminderTimes[jx+1]
-				listTitle[jx] = listTitle[jx+1]
-				listStarting[jx] = listStarting[jx+1]
-				listEnding[jx] = listEnding[jx+1]
-				listDescritption[jx] = listDescritption[jx+1]
-			shouldShiftLeft = False
-        
+	
+	while(getStuckInLoop):
+		currentTime = str(datetime.datetime.now())
+		currentTime = currentTime[11:16]
+		print("stuck in loop")
+		print("the time", currentTime)
+		print ("the reminder time ", listReminderTimes[indexNeeded])
+		if(currentTime != listReminderTimes[indexNeeded]):
+			getStuckInLoop = False
+
+	
+
+	#time.sleep(30)
+	quickstart.main()
+
 	print("End of function")
