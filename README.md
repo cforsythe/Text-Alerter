@@ -13,4 +13,5 @@ Future Work:
 Improve reminder time calcualtion  /
 Allow other users to use service /
 Improve user interaction /
-Make GUI better by adding live graphs
+Make GUI better by adding live graphs /
+Fix various bugs
